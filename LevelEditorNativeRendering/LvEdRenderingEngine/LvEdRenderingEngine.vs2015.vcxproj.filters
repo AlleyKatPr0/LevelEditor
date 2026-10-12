@@ -167,6 +167,9 @@
     <ClInclude Include="Renderer\DeviceManager.h">
       <Filter>Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="Renderer\D3D12Backend.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="Renderer\SwapChain.h">
       <Filter>Renderer</Filter>
     </ClInclude>
@@ -455,6 +458,9 @@
       <Filter>Bridge</Filter>
     </ClCompile>
     <ClCompile Include="Renderer\DeviceManager.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\D3D12Backend.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Renderer\SwapChain.cpp">
