@@ -51,12 +51,13 @@ when loading levels and rendering.
 
 Optional Direct3D 12 backend
 ----------------------------
-The Visual Studio 2015 native-renderer project includes an optional Direct3D 12
-device and DXC shader-compilation interface. The existing editor continues to
-use its Direct3D 11 renderer; the new exports are not yet connected to the
-editor's render loop or swap chains.
+The native-renderer project (historically named with a `vs2015` suffix, but now
+using the Visual Studio 2022 toolset) includes an optional Direct3D 12 device
+and DXC shader-compilation interface. The existing editor continues to use its
+Direct3D 11 renderer; the new exports are not yet connected to the editor's
+render loop or swap chains.
 
-Building this backend requires Windows 10 SDK 10.0.20348 or newer, and a
+Building this backend requires Windows SDK 10.0.22000 or newer, and a
 DXC SDK package containing `inc\dxcapi.h`. Set the `DXC_SDK_PATH` MSBuild
 environment/property to the DXC package root. At runtime, `dxcompiler.dll`
 must be discoverable by the Windows loader. D3D12 and DXC are loaded
