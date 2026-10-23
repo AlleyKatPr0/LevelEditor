@@ -1,4 +1,4 @@
-//Copyright © 2014 Sony Computer Entertainment America LLC. See License.txt.
+//Copyright ï¿½ 2014 Sony Computer Entertainment America LLC. See License.txt.
 
 #ifndef Lighting_h
 #define Lighting_h
@@ -227,5 +227,79 @@ out float3 ambient, out float3 diffuse, out float3 specular)
 
 	}
 	
+}
+
+float3 ComputeMicrofacetSpecular(float3 normal, float3 toEye, float3 toLight,
+                                 float3 radiance, float3 f0, float roughness)
+{
+    float nDotL = saturate(dot(normal, toLight));
+    float nDotV = saturate(dot(normal, toEye));
+    if (nDotL <= 0.0f || nDotV <= 0.0f)
+        return float3(0.0f, 0.0f, 0.0f);
+
+    float3 halfVector = normalize(toEye + toLight);
+    float nDotH = saturate(dot(normal, halfVector));
+    float vDotH = saturate(dot(toEye, halfVector));
+    float alpha = roughness * roughness;
+    float alphaSquared = alpha * alpha;
+    float dTerm = nDotH * nDotH * (alphaSquared - 1.0f) + 1.0f;
+    float distribution = alphaSquared / max(3.14159265f * dTerm * dTerm, 1e-6f);
+
+    float k = (roughness + 1.0f) * (roughness + 1.0f) * 0.125f;
+    float geometryV = nDotV / max(nDotV * (1.0f - k) + k, 1e-6f);
+    float geometryL = nDotL / max(nDotL * (1.0f - k) + k, 1e-6f);
+    float3 fresnel = f0 + (1.0f - f0) * pow(1.0f - vDotH, 5.0f);
+
+    return radiance * fresnel *
+        (distribution * geometryV * geometryL * nDotL /
+         max(4.0f * nDotV * nDotL, 1e-5f));
+}
+
+float3 ComputeMicrofacetLighting(float3 pos, float3 normal, float3 eyePos,
+                                 float3 f0, float roughness, float shadowFactor,
+                                 LightEnvironment env)
+{
+    float3 specular = float3(0.0f, 0.0f, 0.0f);
+    float3 toEye = normalize(eyePos - pos);
+    float4 shadowFactors = float4(shadowFactor, 1.0f, 1.0f, 1.0f);
+    uint i;
+
+    for (i = 0; i < min(2u, env.numDirLights); ++i)
+    {
+        DirLight light = env.dirLight[i];
+        specular += ComputeMicrofacetSpecular(normal, toEye, -light.dir,
+            light.specular * shadowFactors[i], f0, roughness);
+    }
+
+    for (i = 0; i < min(2u, env.numBoxLights); ++i)
+    {
+        BoxLight light = env.boxLight[i];
+        if (pos.x < light.min.x || pos.y < light.min.y || pos.z < light.min.z ||
+            pos.x > light.max.x || pos.y > light.max.y || pos.z > light.max.z)
+            continue;
+
+        float3 range = (light.max - light.min) * 0.5f;
+        float3 center = light.min + range;
+        float edge = MinElm(1.0f - abs(center - pos) / range);
+        float attenuation = dot(light.att, float3(1.0f, edge, edge * edge));
+        specular += ComputeMicrofacetSpecular(normal, toEye, -light.dir,
+            light.dir.specular * attenuation, f0, roughness);
+    }
+
+    for (i = 0; i < min(4u, env.numPointLights); ++i)
+    {
+        PointLight light = env.pointLight[i];
+        float3 toLight = light.pos.xyz - pos;
+        float distanceToLight = length(toLight);
+        if (distanceToLight <= 0.0f || distanceToLight > light.pos.w)
+            continue;
+
+        float falloff = 1.0f - distanceToLight / light.pos.w;
+        float attenuation = dot(light.att, float3(1.0f, falloff, falloff * falloff));
+        specular += ComputeMicrofacetSpecular(normal, toEye, toLight / distanceToLight,
+            light.specular * attenuation, f0, roughness);
+    }
+
+    return specular;
 }
 #endif

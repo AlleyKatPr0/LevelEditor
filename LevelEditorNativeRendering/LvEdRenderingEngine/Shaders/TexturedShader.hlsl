@@ -1,4 +1,4 @@
-//Copyright © 2014 Sony Computer Entertainment America LLC. See License.txt.
+//Copyright ï¿½ 2014 Sony Computer Entertainment America LLC. See License.txt.
 
 //---------------------------------------------------------------------------
 // TexturedShader.hlsl
@@ -172,7 +172,13 @@ float4 PSMain( PS_INPUT input ) : SV_TARGET
 							    cb_lightEnv, 
 								A,D,S);
 
-		fc.xyz = cb_matEmissive.xyz + matdiffuse.xyz * (A + D) + matspecular.xyz * S;
+        // Preserve the legacy material controls while using a GGX microfacet highlight.
+        float roughness = clamp(sqrt(2.0f / (specPower + 2.0f)), 0.08f, 0.95f);
+        float3 f0 = saturate(matspecular.xyz);
+        float3 pbrSpecular = ComputeMicrofacetLighting(input.posW, norm, cb_camPosW,
+            f0, roughness, ShadowFactor, cb_lightEnv);
+		fc.xyz = cb_matEmissive.xyz + matdiffuse.xyz * (1.0f - f0) * (A + D) +
+            pbrSpecular;
     }
 
 	if(cb_fog.enabled)
