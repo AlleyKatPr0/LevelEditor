@@ -67,6 +67,17 @@ with `LvEd_D3D12GetCapabilities`, and compile HLSL profiles supported by the
 installed DXC with `LvEd_D3D12CompileShader`. Release returned bytecode with
 `LvEd_D3D12ReleaseShader`.
 
+The initial DXR scaffold builds triangle bottom-level and instance-based
+top-level acceleration structures through `LvEd_D3D12BuildBottomLevelAccelerationStructure`
+and `LvEd_D3D12BuildTopLevelAccelerationStructure`. Geometry uses 32-bit
+`R32G32B32_FLOAT` vertices; indices are optional and may be 16- or 32-bit.
+Input buffers and referenced bottom-level structures must be D3D12 resources
+from the initialized device. The build calls are synchronous, require a
+nonzero raytracing tier, and return an owned resource that must be released
+with `LvEd_D3D12ReleaseResource`. This does not yet create raytracing pipeline
+state objects, shader tables, or dispatch rays, and it is not wired into the
+editor's D3D11 rendering path.
+
 
 More Info
 ---------
