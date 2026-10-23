@@ -74,7 +74,9 @@ and `LvEd_D3D12BuildTopLevelAccelerationStructure`. Geometry uses 32-bit
 Create input buffers on the initialized device obtained with
 `LvEd_D3D12GetDevice` (release that reference with `LvEd_D3D12ReleaseDevice`).
 Input buffers and referenced bottom-level structures must be D3D12 resources
-from that device. The build calls are synchronous, require a
+from that device; vertex and index buffers must be in
+`D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE`. The build calls are
+synchronous, require a
 nonzero raytracing tier, and return an owned resource that must be released
 with `LvEd_D3D12ReleaseResource`. This does not yet create raytracing pipeline
 state objects, shader tables, or dispatch rays, and it is not wired into the
