@@ -28,9 +28,9 @@ LevelEditor Minimal System Requirements
 
 Development Environment:
 ------------------------
-* Visual Studio 2022 with a Windows 10 SDK is required to build the optional
-  Direct3D 12 backend in the native renderer project (the project retains its
-  historical `vs2015` filename).
+* Visual Studio 2026 18.11.1 with the v145 C++ toolset and the latest Windows
+  SDK installed is the target toolchain for the native renderer project (the
+  project retains its historical `vs2015` filename).
 * The legacy D3D11 projects also include Visual Studio 2010/2013 project files
   for older development environments.
    
@@ -52,12 +52,14 @@ when loading levels and rendering.
 Optional Direct3D 12 backend
 ----------------------------
 The native-renderer project (historically named with a `vs2015` suffix, but now
-using the Visual Studio 2022 toolset) includes an optional Direct3D 12 device
+using the Visual Studio 2026 v145 toolset) includes an optional Direct3D 12 device
 and DXC shader-compilation interface. The existing editor continues to use its
 Direct3D 11 renderer; the new exports are not yet connected to the editor's
 render loop or swap chains.
 
-Building this backend requires Windows SDK 10.0.22000 or newer, and a
+The project selects `WindowsTargetPlatformVersion` `10.0`, so MSBuild uses the
+latest Windows SDK installed on the machine. Building this backend requires
+Windows SDK 10.0.22000 or newer, and a
 DXC SDK package containing `inc\dxcapi.h`. Set the `DXC_SDK_PATH` MSBuild
 environment/property to the DXC package root. At runtime, `dxcompiler.dll`
 must be discoverable by the Windows loader. D3D12 and DXC are loaded
@@ -81,6 +83,11 @@ nonzero raytracing tier, and return an owned resource that must be released
 with `LvEd_D3D12ReleaseResource`. This does not yet create raytracing pipeline
 state objects, shader tables, or dispatch rays, and it is not wired into the
 editor's D3D11 rendering path.
+
+The managed editor and its ATF projects still target .NET Framework 4.0.
+They have not been migrated to .NET 10; that requires replacing or porting
+legacy framework dependencies such as IronPython 2.7 and .NET Remoting before
+the managed application can build and run on .NET 10.
 
 
 More Info
