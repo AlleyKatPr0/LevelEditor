@@ -11,7 +11,7 @@
     <RootNamespace>LevelEditorCore</RootNamespace>
     <AssemblyName>LevelEditorCore</AssemblyName>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>

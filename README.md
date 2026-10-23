@@ -23,22 +23,22 @@ The following LevelEditor features help you construct game levels efficiently an
 
 LevelEditor Minimal System Requirements
 ---------------------------------------
-* Microsoft Windows� 7 64-bit SP1 with platform update or newer.
+* Windows 10 version 20H2 or newer, or Windows 11, for the .NET Framework 4.8.1
+  managed application.
 * Microsoft DirectX� 10 compatible graphics card or newer.
 
 Development Environment:
 ------------------------
-* Visual Studio 2026 18.11.1 with the v145 C++ toolset and the latest Windows
-  SDK installed is the target toolchain for the native renderer project (the
-  project retains its historical `vs2015` filename).
-* The legacy D3D11 projects also include Visual Studio 2010/2013 project files
-  for older development environments.
+* Visual Studio 2026 18.11.1 with the v145 C++ toolset, the .NET Framework
+  4.8.1 Developer Pack, and the latest Windows SDK installed is the target
+  toolchain (the native renderer project retains its historical `vs2015`
+  filename).
    
 Getting Started 
 --------------- 
 To build/run LevelEditor:
 
-1. Open the solution Leveleditor\build\LevelEditor.vs2010.sln in Visual Studio 2010 or later.
+1. Open `build\LevelEditor.vs2015.sln` in Visual Studio 2026.
 1. Change the configuration to Release and then build LevelEditor.
 1. Navigate to the directory in which LevelEditor is built and double-click the file LevelEditor.exe to start LevelEditor.
 1. After LevelEditor starts, select Edit->Preferences and use the Preferences dialog to set the resource root to a location that contains a few ATGI or Collada files and then restart LevelEditor. (Restart LevelEditor just in case).
@@ -84,10 +84,9 @@ with `LvEd_D3D12ReleaseResource`. This does not yet create raytracing pipeline
 state objects, shader tables, or dispatch rays, and it is not wired into the
 editor's D3D11 rendering path.
 
-The managed editor and its ATF projects still target .NET Framework 4.0.
-They have not been migrated to .NET 10; that requires replacing or porting
-legacy framework dependencies such as IronPython 2.7 and .NET Remoting before
-the managed application can build and run on .NET 10.
+The managed editor, ATF projects, interop assembly, and CodeGenDom utility
+target .NET Framework 4.8.1. This keeps the classic .NET Framework/WinForms
+architecture; it is not a migration to modern .NET 10.
 
 
 More Info
