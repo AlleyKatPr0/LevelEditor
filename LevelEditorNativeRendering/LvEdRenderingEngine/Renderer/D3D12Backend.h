@@ -46,6 +46,10 @@ extern "C" LVEDRENDERINGENGINE_API long __stdcall LvEd_D3D12Initialize();
 extern "C" LVEDRENDERINGENGINE_API void __stdcall LvEd_D3D12Shutdown();
 extern "C" LVEDRENDERINGENGINE_API bool __stdcall LvEd_D3D12GetCapabilities(
     D3D12BackendCapabilities* capabilities);
+extern "C" LVEDRENDERINGENGINE_API long __stdcall LvEd_D3D12GetDevice(
+    void** device);
+extern "C" LVEDRENDERINGENGINE_API void __stdcall LvEd_D3D12ReleaseDevice(
+    void* device);
 extern "C" LVEDRENDERINGENGINE_API long __stdcall LvEd_D3D12BuildBottomLevelAccelerationStructure(
     const D3D12RaytracingTriangleGeometry* geometry,
     void** accelerationStructure,

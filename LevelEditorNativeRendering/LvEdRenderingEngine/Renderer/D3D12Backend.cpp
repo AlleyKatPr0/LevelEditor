@@ -168,6 +168,19 @@ public:
         return true;
     }
 
+    HRESULT GetDevice(ID3D12Device** device) const
+    {
+        if (!device)
+            return E_INVALIDARG;
+        *device = NULL;
+        if (!m_device)
+            return E_FAIL;
+
+        m_device->AddRef();
+        *device = m_device.Get();
+        return S_OK;
+    }
+
     HRESULT BuildBottomLevelAccelerationStructure(
         const D3D12RaytracingTriangleGeometry* geometry,
         ID3D12Resource** accelerationStructure)
@@ -194,8 +207,8 @@ public:
         if (FAILED(hr))
             return hr;
 
-        ComPtr<ID3D12Resource> vertices =
-            static_cast<ID3D12Resource*>(geometry->vertexBuffer);
+        ComPtr<ID3D12Resource> vertices;
+        vertices = static_cast<ID3D12Resource*>(geometry->vertexBuffer);
         const D3D12_RESOURCE_DESC vertexDesc = vertices->GetDesc();
         const uint64_t vertexBytes =
             static_cast<uint64_t>(geometry->vertexCount) * geometry->vertexStride;
@@ -651,6 +664,25 @@ extern "C" bool __stdcall LvEd_D3D12GetCapabilities(
     D3D12BackendCapabilities* capabilities)
 {
     return s_backend.GetCapabilities(capabilities);
+}
+
+extern "C" long __stdcall LvEd_D3D12GetDevice(void** device)
+{
+    if (!device)
+        return E_INVALIDARG;
+
+    *device = NULL;
+    ID3D12Device* nativeDevice = NULL;
+    HRESULT hr = s_backend.GetDevice(&nativeDevice);
+    if (SUCCEEDED(hr))
+        *device = nativeDevice;
+    return hr;
+}
+
+extern "C" void __stdcall LvEd_D3D12ReleaseDevice(void* device)
+{
+    if (device)
+        static_cast<ID3D12Device*>(device)->Release();
 }
 
 extern "C" long __stdcall LvEd_D3D12BuildBottomLevelAccelerationStructure(
