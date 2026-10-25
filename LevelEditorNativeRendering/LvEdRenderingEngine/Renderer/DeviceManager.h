@@ -5,6 +5,15 @@
 #include "../Core/NonCopyable.h"
 #include <d3d11.h>
 
+#ifndef LVED_ENABLE_NVRHI
+#define LVED_ENABLE_NVRHI 0
+#endif
+
+#if LVED_ENABLE_NVRHI
+#include <nvrhi/nvrhi.h>
+#endif
+
+
 namespace LvEdEngine
 {
 
@@ -32,11 +41,25 @@ public:
 		return m_pImmediateContext;
 	}
 
+#if LVED_ENABLE_NVRHI
+	nvrhi::IDevice* GetNvrhiDevice() const
+	{
+		return m_nvrhiDevice.Get();
+	}
+#endif
+
 
 private:	
+	void InitializeNvrhi();
+	void ShutdownNvrhi();
+
 	ID3D11Device*           m_pd3dDevice;
 	ID3D11DeviceContext*    m_pImmediateContext;		
 	IDXGIFactory1*          m_pDXGIFactory1;
+
+#if LVED_ENABLE_NVRHI
+	nvrhi::DeviceHandle     m_nvrhiDevice;
+#endif
     
 
 };
@@ -49,31 +72,3 @@ extern DeviceManager* gD3D11;
 // deviceCreationFlags |= D3D11_CREATE_DEVICE_DEBUG;
 // #endif
 // ...
-// ID3D11Debug *d3dDebug = nullptr;
-// if( SUCCEEDED( d3dDevice->QueryInterface( __uuidof(ID3D11Debug), (void**)&d3dDebug ) ) )
-// {
-// ID3D11InfoQueue *d3dInfoQueue = nullptr;
-// if( SUCCEEDED( d3dDebug->QueryInterface( __uuidof(ID3D11InfoQueue), (void**)&d3dInfoQueue ) ) )
-// {
-// #ifdef _DEBUG
-// d3dInfoQueue->SetBreakOnSeverity( D3D11_MESSAGE_SEVERITY_CORRUPTION, true );
-// d3dInfoQueue->SetBreakOnSeverity( D3D11_MESSAGE_SEVERITY_ERROR, true );
-// #endif
-// 
-// D3D11_MESSAGE_ID hide [] =
-// {
-// D3D11_MESSAGE_ID_SETPRIVATEDATA_CHANGINGPARAMS,
-// // Add more message IDs here as needed
-// };
-// 
-// D3D11_INFO_QUEUE_FILTER filter;
-// memset( &filter, 0, sizeof(filter) );
-// filter.DenyList.NumIDs = _countof(hide);
-// filter.DenyList.pIDList = hide;
-// d3dInfoQueue->AddStorageFilterEntries( &filter );
-// d3dInfoQueue->Release();
-// }
-// d3dDebug->Release();
-// }
-//
-//

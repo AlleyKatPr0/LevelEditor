@@ -5,6 +5,10 @@
 #include "../Core/Utils.h"
 #include "DeviceManager.h"
 
+#if LVED_ENABLE_NVRHI
+#include <nvrhi/d3d11.h>
+#endif
+
 namespace LvEdEngine
 {
 
@@ -161,11 +165,16 @@ DeviceManager::DeviceManager(void)
     }        
     Logger::Log(OutputMessageType::Info,L"Feature Level: %s\n", strFeatureLevel);
 
+    InitializeNvrhi();
+
 }
 
 DeviceManager::~DeviceManager(void)
 {
     Logger::Log(OutputMessageType::Info, "start shutdown DX11\n");
+
+    ShutdownNvrhi();
+
 	if( m_pImmediateContext ) 
     {
         m_pImmediateContext->ClearState();	        
@@ -191,6 +200,41 @@ DeviceManager::~DeviceManager(void)
 
 
     Logger::Log(OutputMessageType::Info, "shutdown DX11\n");
+}
+
+void DeviceManager::InitializeNvrhi()
+{
+#if LVED_ENABLE_NVRHI
+    if(!m_pd3dDevice || !m_pImmediateContext)
+    {
+        Logger::Log(OutputMessageType::Error, "NVRHI initialization skipped: D3D11 device/context not available.\n");
+        return;
+    }
+
+    nvrhi::d3d11::DeviceDesc desc;
+    desc.d3d11Device = m_pd3dDevice;
+    desc.immediateContext = m_pImmediateContext;
+    m_nvrhiDevice = nvrhi::d3d11::createDevice(desc);
+
+    if (m_nvrhiDevice)
+    {
+        Logger::Log(OutputMessageType::Info, "NVRHI D3D11 backend initialized.\n");
+    }
+    else
+    {
+        Logger::Log(OutputMessageType::Error, "NVRHI D3D11 backend creation failed.\n");
+    }
+#else
+    Logger::Log(OutputMessageType::Info, "NVRHI integration disabled (LVED_ENABLE_NVRHI=0).\n");
+#endif
+}
+
+void DeviceManager::ShutdownNvrhi()
+{
+#if LVED_ENABLE_NVRHI
+    m_nvrhiDevice = nullptr;
+    Logger::Log(OutputMessageType::Info, "NVRHI shutdown complete.\n");
+#endif
 }
 
 }
